@@ -1,4 +1,4 @@
-name = input("Hi! What's your name, amigo? ")
+name = input("Hi! What's your name, friend? ")
 year_birth = int(input("Ok,do you remember when you were born? \
 Let's start with the year of birth - "))
 month_birth = int(input("The month of your birth - "))
