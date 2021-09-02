@@ -1,43 +1,51 @@
-def getNumber(x):
+def check_if_number(x):
     while x:
         try:
-            getArg = int(x)
+            get_number = int(x)
         except ValueError:
             try:
-                getArg = float(x)
+                get_number = float(x)
             except ValueError:
-                print('Incorrect type. Please, enter a number.')
-                x = input()
+                if x == '0':
+                    get_number = int(0)
+                elif x == '':
+                    print("It's empty. Please, enter something.")
+                    x = input()
+                    continue
+                else:
+                    print('Incorrect type. Please, enter a number.')
+                    x = input()
+                    continue
             else:
                 break
         else:
             break
-    return getArg
+    return get_number
 
 
-x = getNumber(input())
+x = check_if_number(input())
 while True:
     operation1 = input('Use +, -, *, /, ** or = for answer: ')
     while operation1 != '=':
         if operation1 == '+':
-            y = getNumber(input())
+            y = check_if_number(input())
             answer = x + y
         elif operation1 == '-':
-            y = getNumber(input())
+            y = check_if_number(input())
             answer = x - y
         elif operation1 == '*':
-            y = getNumber(input())
+            y = check_if_number(input())
             answer = x * y
         elif operation1 == '**':
-            y = getNumber(input())
+            y = check_if_number(input())
             answer = x ** y
         elif operation1 == '/':
-            y = getNumber(input())
+            y = check_if_number(input())
             if y != 0:
                 answer = x / y
             else:
                 print('Division by zero. Please, change the divisor')
-                y = getNumber(input())
+                y = check_if_number(input())
                 answer = x / y
         else:
             print('Incorrect operation. Please, try again.')
@@ -53,5 +61,6 @@ while True:
     elif a == 's' or a == 'S':
         break
     else:
-        x = getNumber(a)
+        x = check_if_number(a)
         continue
+        
