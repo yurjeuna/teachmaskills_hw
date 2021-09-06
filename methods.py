@@ -6,16 +6,16 @@ def check_if_number(x):
     while x:
         try:
             get_number = int(x)
-            answer = 'True'
+            answer = True
         except ValueError:
             if x == '0':
-                answer = 'True'
+                answer = True
             elif x == '':
                 print("It's empty. Please, enter something.")
                 x = input()
                 continue
             else:
-                answer = 'False'
+                answer = False
                 break
         else:
             break
