@@ -1,3 +1,4 @@
+import json
 task_list = []
 tasks_dict = {key: "In process" for key in task_list}
 fool_task_list = list(tasks_dict.items())
@@ -33,8 +34,15 @@ while x:
             print((i + 1), fool_task_list[i][1], fool_task_list[i][0],  sep=' ')
         a = input('If you want to open task list from file, press 1')
         if a == '1':
-            fin = open('tasks.txt', 'r')
-            print(fin.readlines())
+            with open('data_file.json', 'r') as task_file:
+                data = json.load(task_file)
+                print(data)
+            b = input('If you want to transfer task list from file for new operations, press 1')
+            if b == '1':
+                tasks_dict = json.load(task_file)
+                task_list = list(tasks_dict.keys())
+                fool_task_list = list(tasks_dict.items())
+            continue
         continue
 
     elif to_do == '2':
@@ -100,15 +108,8 @@ while x:
         continue
 
     elif to_do == '7':
-        fout = open('tasks.txt', 'w')
-        fout.write(tasks_dict)
-        fout.write(task_list)
-        fout.write(fool_task_list)
+        with open('data_file.json', 'w') as task_file:
+            json.dump(tasks_dict, task_file)
+        continue
 
-        print('Now in file:', )
-        for line in fout:
-            print(fout.readlines())
     break
-
-fin.close()
-fout.close()
