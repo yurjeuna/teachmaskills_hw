@@ -1,8 +1,8 @@
 name = input("Hi! What's your name, friend? ")
-year_birth = int(input("Ok,do you remember when you were born? \
+year_birth = int(input("Ok, do you remember when you were born? \
 Let's start with the year of birth - "))
 month_birth = int(input("The month of your birth - "))
-day_birth = int(input("And the day of your birth, please, - "))
+day_birth = int(input("And the day of your birth, please,- "))
 experience = int(input("Have you studied programming before? \
 Choose the right option: 1 No 2 On your own 3 On course 4 In the university "))
 goal = input("What are your expectations from this course? Continue the phrase: I'm here for ... ")
