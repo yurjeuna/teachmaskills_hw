@@ -329,7 +329,7 @@ def ranging(list_for_ranging):
         i = start
         while i > stop:
             ranged_list.append(i)
-            i -= step
+            i -= (step * -1)
     return ranged_list
 
 def print_range():
