@@ -291,6 +291,7 @@ def get_a_type(x):
                 get_type = int
             else:
                 print('Incorrect type')
+
     return get_type
 
 def ranging(list_for_ranging):
