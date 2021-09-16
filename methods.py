@@ -282,11 +282,16 @@ def get_a_type(x):
         get_i = int(x)
         get_type = int
     except ValueError:
-        if x == '0':
-            get_i = int(x)
-            get_type = int
-        else:
-            print('Incorrect type')
+        try:
+            get_i = float(x)
+            get_type = float
+        except ValueError:
+            if x == '0':
+                get_i = int(x)
+                get_type = int
+            else:
+                print('Incorrect type')
+
     return get_type
 
 def ranging(list_for_ranging):
@@ -296,7 +301,7 @@ def ranging(list_for_ranging):
     ranged_list = []
     while True:
         if len(list_for_ranging) == 1:
-            get_type0 = check_if_number(list_for_ranging[0])
+            get_type0 = get_a_type(list_for_ranging[0])
             stop = get_type0(list_for_ranging[0])
             break
         elif len(list_for_ranging) == 2:
@@ -316,7 +321,6 @@ def ranging(list_for_ranging):
         else:
             print('Enter up to 3 characters')
             continue
-
     if start < stop:
         i = start
         while i < stop:
