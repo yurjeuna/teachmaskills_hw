@@ -1,14 +1,14 @@
 import json
+import os
+
 task_list = []
 tasks_dict = {key: "In process" for key in task_list}
 fool_task_list = list(tasks_dict.items())
 
 
 def editing(dictionary, task_status, old_task, new_task):
-    dictionary2 = dict()
-    dictionary2[new_task] = task_status
+    dictionary[new_task] = task_status
     del dictionary[old_task]
-    dictionary.update(dictionary2)
     return dictionary
 
 def adding(dictionary, task):
@@ -154,6 +154,7 @@ def print_search(my_dict, my_list, fool_list):
     while True:
         my_list, fool_list = renew(my_dict, my_list, fool_list)
         search = input('What should we look for? ')
+        search.lower()
         for i in my_list:
             if i.find(search) != -1:
                 print((my_list.index(i) + 1), i, my_dict[i])
@@ -167,26 +168,63 @@ def print_task_list(my_dict, my_list, fool_list):
     print_periodic_fool_task_list(fool_list)
     a = input('If you want to open task list from file, press 1')
     if a == '1':
-        with open('data_file.json', 'r') as task_file:
-            data = json.load(task_file)
+        os.getcwd()
+        try:
+            os.chdir("task_folder")
+        except FileNotFoundError:
+            os.mkdir("task_folder")
+        file_lis = os.listdir()
+        if len(file_lis) == 0:
+            print('No saved files')
+        else:
+            print("Saved files:")
+            for i in range(len(file_lis)):
+                print(i + 1, file_lis[i], sep=' ')
+            file_numb = int(input("What file you want to open? Enter a number"))
+            with open(file_lis[file_numb - 1], 'r') as task_file:
+                data = json.load(task_file)
             data_list = list(data.keys())
             print('Saved in file:')
             for i in data_list:
                 print((data_list.index(i) + 1), i, data[i])
-    b = input('If you want to transfer task list from file for new operations, press 1')
-    if b == '1':
-        my_dict = dict(data)
-        my_list, fool_list = renew(my_dict, my_list, fool_list)
-        print_periodic_fool_task_list(fool_list)
+        b = input('If you want to transfer task list from file for new operations, press 1')
+        if b == '1':
+            my_dict = dict(data)
+            my_list, fool_list = renew(my_dict, my_list, fool_list)
+            print_periodic_fool_task_list(fool_list)
     return True
 
 
 def print_save(my_dict, my_list, fool_list):
     my_list, fool_list = renew(my_dict, my_list, fool_list)
-    with open('data_file.json', 'w') as task_file:
-        json.dump(my_dict, task_file)
-    print('Saved:')
-    print_periodic_fool_task_list(fool_list)
+    os.getcwd()
+    try:
+        os.chdir("task_folder")
+    except FileNotFoundError:
+        os.mkdir("task_folder")
+    file_lis = os.listdir()
+    print("Saved files:")
+    for i in range(len(file_lis)):
+        print(i + 1, file_lis[i], sep=' ')
+    while True:
+        file_choice = input("1 - save to a new file \n2 - save to existing file")
+        if file_choice == '1':
+            file_name = input("In what file you want to save your task list?")
+            with open('somefile.json', 'w') as task_file:
+                json.dump(my_dict, task_file)
+            os.rename('somefile.json', file_name)
+            print('Saved:')
+            print_periodic_fool_task_list(fool_list)
+            break
+        elif file_choice == '2':
+            file_numb = int(input("In what file you want to save your task list? Enter a number"))
+            with open(file_lis[file_numb - 1], 'w') as task_file:
+                json.dump(my_dict, task_file)
+            print('Saved:')
+            print_periodic_fool_task_list(fool_list)
+            break
+        else:
+            continue
     return True
 
 def exit_from():
