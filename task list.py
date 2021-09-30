@@ -1,268 +1,233 @@
 import json
 import os
 
-task_list = []
-tasks_dict = {key: "In process" for key in task_list}
-fool_task_list = list(tasks_dict.items())
+class Tasks:
+    def __init__(self, task):
+        self.task = task
+        self.task_status = "In process"
 
+class Options:
+    task_list = []
 
-def editing(dictionary, task_status, old_task, new_task):
-    dictionary[new_task] = task_status
-    del dictionary[old_task]
-    return dictionary
+    @staticmethod
+    def print_periodic_task_list():
+        for i in range(len(Options.task_list)):
+            print((i + 1), Options.task_list[i][0], Options.task_list[i][1], sep=' ')
 
-def adding(dictionary, task):
-    dictionary2 = dict()
-    dictionary2[task] = "In process"
-    dictionary.update(dictionary2)
-    return dictionary
+    def success_dec(func):
+        def wrapper(*args, **kwargs):
+            while True:
+                result = func(*args, **kwargs)
+                Options.print_periodic_task_list()
+                answer = input('Shall we repeat? (y/n) ')
+                if answer.lower() not in ('y', 'yes'):
+                    break
+                continue
+            return result
+        return wrapper
 
-def deleting(number, my_list, dictionary):
-    del dictionary[my_list[number]]
-    return True
+    @staticmethod
+    def print_periodic_task_list():
+        for i in range(len(Options.task_list)):
+            print((i + 1), Options.task_list[i][0], Options.task_list[i][1], sep=' ')
 
-def actions(action):
-    action = input(f'Do you want to {action} with another one? (y/n) ')
-    return action in ('y', 'Y')
+    @staticmethod
+    @success_dec
+    def print_add():
+        Options.task_list.append(Tasks(input('Enter a new task - ')))
+        return Options.task_list
 
-def print_add(my_dict, my_list, fool_list):
-    while True:
-        new_task = input('Enter a new task - ')
-        my_dict = adding(my_dict, new_task)
-        my_list, fool_list = renew(my_dict, my_list, fool_list)
-        if not actions('add'):
+    def valid_number(number):
+        return number.isdigit() and 0 < int(number) <= len(Options.task_list)
+
+    @staticmethod
+    @success_dec
+    def print_delete():
+        while True:
+            Options.print_periodic_task_list()
+            del_task = input('What task do you want to delete? Enter a number - ')
+            if not Options.valid_number(del_task):
+                print('Non valid task number! ')
+                Options.print_periodic_task_list()
+                continue
+            del_task = int(del_task) - 1
+            del [Options.task_list[del_task]]
             break
-        continue
-    return True
+        return Options.task_list
 
-def print_periodic_task_list(k_list):
-    for i in range(len(k_list)):
-        print(i + 1, k_list[i], sep=' ')
-    pass
+    def editing(cons_task_status, old_task, new_task):
+        Options.task_list[new_task] = cons_task_status
+        del Options.task_list[old_task]
+        return Options.task_list
 
-def print_periodic_fool_task_list(k_list):
-    for i in range(len(k_list)):
-        print((i + 1), k_list[i][1], k_list[i][0],  sep=' ')
-    pass
-
-def valid_number(number, my_list):
-    return number.isdigit() and 0 < int(number) <= len(my_list)
-
-def renew(my_dict, my_list, fool_list):
-    my_list = list(my_dict.keys())
-    fool_list = list(my_dict.items())
-    return my_list, fool_list
-
-def print_delete(my_dict, my_list, fool_list):
-    while True:
-        my_list, fool_list = renew(my_dict, my_list, fool_list)
-        print_periodic_task_list(my_list)
-        del_task = input('What task do you want to delete? Enter a number - ')
-        if not valid_number(del_task, my_list):
-            print('Non valid task number! ')
-            print_periodic_task_list(my_list)
-            continue
-        del_task = int(del_task) - 1
-        deleting(del_task, my_list, my_dict)
-        my_list, fool_list = renew(my_dict, my_list, fool_list)
-        print_periodic_task_list(my_list)
-        if not actions('delete'):
+    @staticmethod
+    @success_dec
+    def print_edit():
+        while True:
+            Options.print_periodic_task_list()
+            edit_task = input('What task do you want to edit? Enter a number - ')
+            if not Options.valid_number(edit_task):
+                print('Non valid task number!')
+                continue
+            edit_task = int(edit_task) - 1
+            edited_task = input('Enter a new text - ')
+            unedited_task = Options.task_list[edit_task]
+            unedited_task_status = Options.task_list[edit_task][1]
+            Options.editing(unedited_task_status, unedited_task, edited_task)
             break
-        continue
-    return True
+        return Options.task_list
 
-def print_edit(my_dict, my_list, fool_list):
-    while True:
-        my_list, fool_list = renew(my_dict, my_list, fool_list)
-        print_periodic_task_list(my_list)
-        edit_task = input('What task do you want to edit? Enter a number - ')
-        if not valid_number(edit_task, my_list):
-            print('Non valid task number!')
-            continue
-        edit_task = int(edit_task) - 1
-        edited_task = input('Enter a new text - ')
-        unedited_task = my_list[edit_task]
-        unedited_task_status = my_dict[unedited_task]
-        my_dict = editing(my_dict, unedited_task_status, unedited_task, edited_task)
-        my_list, fool_list = renew(my_dict, my_list, fool_list)
-        print_periodic_task_list(my_list)
-        if not actions('edit'):
+    @staticmethod
+    @success_dec
+    def print_mark():
+        while True:
+            Options.print_periodic_task_list()
+            numb_task_for_status_changing = input('What task do you want to mark as completed? Enter a number - ')
+            if not Options.valid_number(numb_task_for_status_changing):
+                print('Non valid task number!')
+                continue
+            numb_task_for_status_changing = int(numb_task_for_status_changing) - 1
+            task_for_status_changing = Options.task_list[numb_task_for_status_changing]
+            Options.task_list[task_for_status_changing][1] = 'Done'
             break
-        continue
-    return True
+        return Options.task_list
 
-def print_mark(my_dict, my_list, fool_list):
-    while True:
-        my_list, fool_list = renew(my_dict, my_list, fool_list)
-        print_periodic_fool_task_list(fool_list)
-        numb_task_for_status_changing = input('What task do you want to mark as completed? Enter a number - ')
-        if not valid_number(numb_task_for_status_changing, my_list):
-            print('Non valid task number!')
-            continue
-        numb_task_for_status_changing = int(numb_task_for_status_changing) - 1
-        task_for_status_changing = my_list[numb_task_for_status_changing]
-        my_dict[task_for_status_changing] = 'Done'
-        my_list, fool_list = renew(my_dict, my_list, fool_list)
-        print_periodic_fool_task_list(fool_list)
-        if not actions('mark as completed'):
+    @staticmethod
+    @success_dec
+    def print_highlight_all():
+        while True:
+            multiple = input('If you want to delete all tasks, press 1. \n'
+                             'If you want to mark all tasks as completed, press 2. \n'
+                             'If you want to mark all tasks as uncompleted, press 3. - ')
+            if multiple == '1':
+                Options.task_list = []
+            elif multiple == '2':
+                for i in range(len(Options.task_list)):
+                    Options.task_list[i][1] = "Done"
+                Options.print_periodic_task_list()
+            elif multiple == '3':
+                for i in range(len(Options.task_list)):
+                    Options.task_list[i][1] = "In process"
+                Options.print_periodic_task_list()
+            else:
+                break
             break
-        continue
-    return True
+        return Options.task_list
 
-def print_highlight_all(my_dict, my_list, fool_list):
-    while True:
-        multiple = input('If you want to delete all tasks, press 1. \n'
-                         'If you want to mark all tasks as completed, press 2. \n'
-                         'If you want to mark all tasks as uncompleted, press 3. - ')
-        if multiple == '1':
-            my_dict = dict()
-            my_list, fool_list = renew(my_dict, my_list, fool_list)
-        elif multiple == '2':
-            for i in my_dict:
-                my_dict[i] = "Done"
-            my_list, fool_list = renew(my_dict, my_list, fool_list)
-            print_periodic_fool_task_list(fool_list)
-        elif multiple == '3':
-            for i in my_dict:
-                my_dict[i] = "In process"
-            my_list, fool_list = renew(my_dict, my_list, fool_list)
-            print_periodic_fool_task_list(fool_list)
-        else:
-            continue
-        if not actions('highlight all'):
-            break
-        continue
-    return True
+    @staticmethod
+    def print_show_completed():
+        list_done = list(filter(lambda x: Options.task_list[x][1] == "Done", Options.task_list))
+        for i in list_done:
+            if i in Options.task_list:
+                print((Options.task_list(i) + 1), i, 'Done',  sep=' ')
+        return True
 
-def print_show_completed(my_dict, my_list, fool_list):
-    my_list, fool_list = renew(my_dict, my_list, fool_list)
-    list_done = list(filter(lambda x: my_dict[x] == "Done", my_dict.keys()))
-    for i in list_done:
-        if i in my_dict.keys():
-            print((my_list.index(i) + 1), i, 'Done',  sep=' ')
-    return True
+    @staticmethod
+    def print_show_uncompleted():
+        list_undone = list(filter(lambda x: Options.task_list[x][1] == "In process", Options.task_list))
+        for i in list_undone:
+            if i in Options.task_list:
+                print((Options.task_list(i) + 1), i, 'In process',  sep=' ')
+        return True
 
-def print_show_uncompleted(my_dict, my_list, fool_list):
-    my_list, fool_list = renew(my_dict, my_list, fool_list)
-    list_undone = list(filter(lambda x: my_dict[x] == "In process", my_dict.keys()))
-    for i in list_undone:
-        if i in my_dict.keys():
-            print((my_list.index(i) + 1), i, 'In process',  sep=' ')
-    return True
+    @staticmethod
+    def print_search():
+        while True:
+            search = input('What should we look for? ')
+            for i in Options.task_list:
+                if i.find(search) != -1:
+                    print((Options.task_list.index(i) + 1), i, Options.task_list[i][1])
+        return True
 
-def print_search(my_dict, my_list, fool_list):
-    while True:
-        my_list, fool_list = renew(my_dict, my_list, fool_list)
-        search = input('What should we look for? ')
-        search.lower()
-        for i in my_list:
-            if i.find(search) != -1:
-                print((my_list.index(i) + 1), i, my_dict[i])
-        if not actions('search text'):
-            break
-        continue
-    return True
+    @staticmethod
+    def print_task_list():
+        Options.print_periodic_task_list()
+        a = input('If you want to open task list from file, press 1')
+        if a == '1':
+            os.getcwd()
+            try:
+                os.chdir("task_folder")
+            except FileNotFoundError:
+                os.mkdir("task_folder")
+            file_lis = os.listdir()
+            if len(file_lis) == 0:
+                print('No saved files')
+            else:
+                print("Saved files:")
+                for i in range(len(file_lis)):
+                    print(i + 1, file_lis[i], sep=' ')
+                file_numb = int(input("What file you want to open? Enter a number"))
+                with open(file_lis[file_numb - 1], 'r') as task_file:
+                    data = json.load(task_file)
+                data_list = Options.task_list
+                print('Saved in file:')
+                for i in data_list:
+                    print((data_list.index(i) + 1), i, data[i])
+            b = input('If you want to transfer task list from file for new operations, press 1')
+            if b == '1':
+                Options.task_list = dict(data)
+                Options.print_periodic_task_list()
+        return True
 
-def print_task_list(my_dict, my_list, fool_list):
-    my_list, fool_list = renew(my_dict, my_list, fool_list)
-    print_periodic_fool_task_list(fool_list)
-    a = input('If you want to open task list from file, press 1')
-    if a == '1':
+    @staticmethod
+    def print_save():
         os.getcwd()
         try:
             os.chdir("task_folder")
         except FileNotFoundError:
             os.mkdir("task_folder")
         file_lis = os.listdir()
-        if len(file_lis) == 0:
-            print('No saved files')
-        else:
-            print("Saved files:")
-            for i in range(len(file_lis)):
-                print(i + 1, file_lis[i], sep=' ')
-            file_numb = int(input("What file you want to open? Enter a number"))
-            with open(file_lis[file_numb - 1], 'r') as task_file:
-                data = json.load(task_file)
-            data_list = list(data.keys())
-            print('Saved in file:')
-            for i in data_list:
-                print((data_list.index(i) + 1), i, data[i])
-        b = input('If you want to transfer task list from file for new operations, press 1')
-        if b == '1':
-            my_dict = dict(data)
-            my_list, fool_list = renew(my_dict, my_list, fool_list)
-            print_periodic_fool_task_list(fool_list)
-    return True
+        print("Saved files:")
+        for i in range(len(file_lis)):
+            print(i + 1, file_lis[i], sep=' ')
+        while True:
+            file_choice = input("1 - save to a new file \n2 - save to existing file")
+            if file_choice == '1':
+                file_name = input("In what file you want to save your task list?")
+                with open('somefile.json', 'w') as task_file:
+                    json.dump(Options.task_list, task_file)
+                os.rename('somefile.json', (file_name + '.json'))
+                print('Saved:')
+                Options.print_periodic_task_list()
+                break
+            elif file_choice == '2':
+                file_numb = int(input("In what file you want to save your task list? Enter a number"))
+                with open(file_lis[file_numb - 1], 'w') as task_file:
+                    json.dump(Options.task_list, task_file)
+                print('Saved:')
+                Options.print_periodic_task_list()
+                break
+            else:
+                continue
+        return True
 
+    @staticmethod
+    def exit_from():
+        exit()
 
-def print_save(my_dict, my_list, fool_list):
-    my_list, fool_list = renew(my_dict, my_list, fool_list)
-    os.getcwd()
-    try:
-        os.chdir("task_folder")
-    except FileNotFoundError:
-        os.mkdir("task_folder")
-    file_lis = os.listdir()
-    print("Saved files:")
-    for i in range(len(file_lis)):
-        print(i + 1, file_lis[i], sep=' ')
+def main():
+
+    menu_dict = {
+        '2': (Options.print_add, 'add a new task'),
+        '3': (Options.print_delete, 'delete a task'),
+        '4': (Options.print_edit, 'edit a task'),
+        '5': (Options.print_mark, 'mark a task as completed'),
+        '6': (Options.print_highlight_all, 'highlight all tasks'),
+        '7': (Options.print_show_completed, 'show only completed tasks'),
+        '8': (Options.print_show_uncompleted, 'show only uncompleted tasks'),
+        '9': (Options.print_search, 'search by text'),
+        '10': (Options.print_save, 'save this task list'),
+        '0': (Options.exit_from, 'exit')
+    }
+
     while True:
-        file_choice = input("1 - save to a new file \n2 - save to existing file")
-        if file_choice == '1':
-            file_name = input("In what file you want to save your task list?")
-            with open('somefile.json', 'w') as task_file:
-                json.dump(my_dict, task_file)
-            os.rename('somefile.json', file_name)
-            print('Saved:')
-            print_periodic_fool_task_list(fool_list)
-            break
-        elif file_choice == '2':
-            file_numb = int(input("In what file you want to save your task list? Enter a number"))
-            with open(file_lis[file_numb - 1], 'w') as task_file:
-                json.dump(my_dict, task_file)
-            print('Saved:')
-            print_periodic_fool_task_list(fool_list)
-            break
-        else:
+        for i in menu_dict:
+            print(i, menu_dict[i][1], sep=' ', end='\n')
+        menu_numb = input('Choose, what should we do? ')
+        if menu_numb not in menu_dict.keys():
+            print("Incorrect. Try again")
             continue
+        menu_dict[menu_numb][0]()
     return True
 
-def exit_from():
-    exit()
-
-menu = """
-\nChoice menu option:\n
-1 - open (previous) task list
-2 - add a new task
-3 - delete a task
-4 - edit a task
-5 - mark a task as completed
-6 - highlight all tasks
-7 - show only completed tasks
-8 - show only uncompleted tasks
-9 - search by text
-10 - save this task list
-0 - exit
-"""
-
-menu_dict = {
-    '1': print_task_list,
-    '2': print_add,
-    '3': print_delete,
-    '4': print_edit,
-    '5': print_mark,
-    '6': print_highlight_all,
-    '7': print_show_completed,
-    '8': print_show_uncompleted,
-    '9': print_search,
-    '10': print_save,
-    '0': exit_from
-}
-
-while True:
-    menu_numb = input(menu)
-    choice = menu_dict.get(menu_numb)
-    if not choice:
-        print("No entered option. Try again")
-        continue
-    choice(tasks_dict, task_list, fool_task_list)
+main()
