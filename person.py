@@ -19,8 +19,8 @@ class Work:
 class Person(Passport, Car, Work):
     def __init__(self, name: str, surname: str, date_of_birth: datetime, sex, money: int, father=None, mother=None):
         self.name = name
-        self.surname = father.surname
-        self.date_of_birth = datetime.datetime.strptime(self.date_of_birth, '%Y-%m-%d').date()
+        self.surname = surname
+        self.date_of_birth = datetime.strptime(date_of_birth, '%Y-%m-%d')
         self.sex = sex
         self.money = money
         self.father = father
@@ -28,7 +28,7 @@ class Person(Passport, Car, Work):
 
     @property
     def age(self):
-        age = datetime.today() - self.date_of_birth()
+        age = datetime.today() - self.date_of_birth
         return age.days // 365
 
     @property
